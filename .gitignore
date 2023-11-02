@@ -1,4 +1,5 @@
 makefile
+.env
 
 # Logs
 logs
