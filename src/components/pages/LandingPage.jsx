@@ -1,4 +1,3 @@
-import { Button, Input } from "react-aria-components";
 import { FaHashtag } from "react-icons/fa";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Link } from "react-router-dom";
@@ -19,17 +18,17 @@ const LandingPage = () => {
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <FaHashtag className="text-primary" size={"1.5rem"} />
                 </div>
-                <Input
+                <input
                   className="z-10 w-full rounded-md border py-4 pl-12 pr-[3.5rem] text-xl focus:outline-none"
                   type="text"
                   placeholder="Masukkan code"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <Button
+                  <button
                     className={"cursor-pointer rounded-full bg-primary p-2"}
                   >
                     <AiOutlineArrowRight color="white" size={"1.25rem"} />
-                  </Button>
+                  </button>
                 </div>
               </form>
             </div>

@@ -1,4 +1,3 @@
-import { Button } from "react-aria-components";
 import {
   checkOtp,
   selectMasterError,
@@ -62,9 +61,9 @@ const MasterOtp = () => {
               value={formik.values.otp}
             />
           </div>
-          <Button className="text-blue-500 outline-none">
+          <button className="text-blue-500 outline-none">
             Send new otp code
-          </Button>
+          </button>
           <button
             className={`${
               formik.isSubmitting ? "bg-primarySoft" : "bg-primary"
