@@ -82,6 +82,10 @@ export const generateInvitation = createAsyncThunk(
     } catch (err) {
       setSubmitting(false);
       console.error("Request failed", err);
+      if (err.response.status === 401) {
+        window.location.href = "/";
+        return;
+      }
       return rejectWithValue(err.response.data);
     } finally {
       setSubmitting(false);
@@ -143,9 +147,8 @@ const masterSlice = createSlice({
       .addCase(checkOtp.fulfilled, (state, action) => {
         state.status = "idle";
         console.log(action);
-        state.data = action.payload.data;
+        state.data = { logged: true, ...action.payload.data };
         state.error = false;
-        state.data.logged = true;
         sessionStorage.setItem("master_logged", "true");
       })
       .addCase(checkOtp.rejected, (state, action) => {

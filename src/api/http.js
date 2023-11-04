@@ -17,6 +17,7 @@ function createRetryInterceptor(maxRetries = 3, retryDelay = 500) {
   return async (err) => {
     console.log(err);
     if (retries >= maxRetries) {
+      console.log("max retry");
       return Promise.reject(err);
     }
 
@@ -29,31 +30,40 @@ function createRetryInterceptor(maxRetries = 3, retryDelay = 500) {
       return http({ ...err.config, baseURL: http.defaults.baseURL });
     } else if (err.response.status === 401) {
       retries++;
-      // refresh the token
 
+      // refresh the token
       const masterLogged = sessionStorage.getItem("master_logged");
       const adminLogged = sessionStorage.getItem("admin_logged");
 
       if (masterLogged === "true") {
-        await masterService.refreshToken();
+        try {
+          await masterService.refreshToken();
+          return http({ ...err.config, baseURL: http.defaults.baseURL });
+        } catch (err) {
+          return Promise.reject(err);
+        }
       } else if (adminLogged === "true") {
-        await adminService.refreshToken();
+        try {
+          await adminService.refreshToken();
+          return http({ ...err.config, baseURL: http.defaults.baseURL });
+        } catch (err) {
+          return Promise.reject(err);
+        }
       }
       // else{
       // user
       // }
-
-      // this is retrying to request
-      return http({ ...err.config, baseURL: http.defaults.baseURL });
+      else {
+        retries = maxRetries;
+      }
     }
-
     return Promise.reject(err);
   };
 }
 
 http.interceptors.response.use(
   async (res) => res,
-  createRetryInterceptor(1, 3000),
+  createRetryInterceptor(10, 3000),
 );
 
 export default http;

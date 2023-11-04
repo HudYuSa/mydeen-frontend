@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import adminService from "../api/services/adminService";
+import { convertToCamelCase } from "../utils/json";
 
 const initialState = {
   data: {
@@ -89,7 +90,7 @@ const adminSlice = createSlice({
       state.signup = false;
     },
     updateAdminData: (state, action) => {
-      state.data = action.payload;
+      state.data = convertToCamelCase(action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -114,11 +115,12 @@ const adminSlice = createSlice({
       .addCase(signin.pending, (state) => {
         state.status = "pending";
       })
-      .addCase(signin.fulfilled, (state) => {
+      .addCase(signin.fulfilled, (state, action) => {
         state.status = "idle";
         state.error = false;
         state.signin = true;
-        state.data.logged = true;
+        const camelCaseNamingData = convertToCamelCase(action.payload.data);
+        state.data = { logged: true, ...camelCaseNamingData };
         sessionStorage.setItem("admin_logged", "true");
       })
       .addCase(signin.rejected, (state, action) => {

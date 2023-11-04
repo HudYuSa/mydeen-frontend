@@ -2,13 +2,9 @@ import { Button, Input } from "react-aria-components";
 import { FaHashtag } from "react-icons/fa";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { selectMaster } from "../../slices/masterSlice";
 import AppLogo from "../features/AppLogo";
 
 const LandingPage = () => {
-  const master = useSelector(selectMaster);
-  console.log(master);
   return (
     <>
       <AppLogo />

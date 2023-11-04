@@ -11,6 +11,7 @@ export default {
         mainBackground: "#FAFAFA",
         confirm: "#00990F",
         confirmSoft: "#8ED595",
+        grayed: "#868686",
       },
     },
   },

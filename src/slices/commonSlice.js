@@ -23,6 +23,7 @@ export const checkRole = createAsyncThunk(
         sessionStorage.setItem("master_logged", "true");
       } else if (res.data.data.type === "admin") {
         dispatch(updateAdminData({ ...res.data.data, logged: true }));
+        sessionStorage.setItem("admin_logged", "true");
       } else {
         // do something for user
       }

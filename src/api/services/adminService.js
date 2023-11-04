@@ -1,5 +1,9 @@
 import http from "../http";
 
+const getLiveEvents = (adminCode) => {
+  return http.get("/api/admin/logout", adminCode);
+};
+
 const signup = (signupCredentials) => {
   return http.post("api/admin/signup", signupCredentials);
 };
@@ -25,6 +29,7 @@ const logout = () => {
 };
 
 const adminService = {
+  getLiveEvents,
   signup,
   signin,
   refreshToken,
