@@ -1,3 +1,4 @@
+import { convertObjToUnderscoreCase } from "../../utils/json";
 import http from "../http";
 
 const createEvent = (eventCredentials) => {
@@ -37,26 +38,39 @@ const finishEvent = (eventID) => {
 };
 
 const updateEventName = (eventID, eventName) => {
-  return http.patch(`/api/event/${eventID}/event-name`, eventName);
+  return http.patch(
+    `/api/event/${eventID}/event-name`,
+    convertObjToUnderscoreCase({ eventName }),
+  );
 };
 
 const updateEventDate = (eventID, eventDate) => {
-  return http.patch(`/api/event/${eventID}/start-date`, eventDate);
+  return http.patch(
+    `/api/event/${eventID}/start-date`,
+    convertObjToUnderscoreCase({ startDate: eventDate }),
+  );
 };
 
-const updateModeration = (eventID, moderation) => {
-  return http.patch(`/api/event/${eventID}/moderation`, moderation);
+const updateModeration = (eventID, mod) => {
+  return http.patch(`/api/event/${eventID}/moderation`, {
+    moderation: mod,
+  });
 };
 
 const updateMaxQuestionLength = (eventID, maxQuestionLength) => {
   return http.patch(
     `/api/event/${eventID}/max-question-length`,
-    maxQuestionLength,
+    convertObjToUnderscoreCase({
+      maxQuestionLength,
+    }),
   );
 };
 
 const updateMaxQuestions = (eventID, maxQuestions) => {
-  return http.patch(`/api/event/${eventID}/max-questions`, maxQuestions);
+  return http.patch(
+    `/api/event/${eventID}/max-questions`,
+    convertObjToUnderscoreCase({ maxQuestions }),
+  );
 };
 
 const eventService = {

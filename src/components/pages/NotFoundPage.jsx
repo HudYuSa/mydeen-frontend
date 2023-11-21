@@ -1,11 +1,20 @@
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { selectAdminLoggged } from "../../slices/adminSlice";
 import { selectMasterLoggged } from "../../slices/masterSlice";
+import { resetError } from "../../slices/eventSlice";
 
 const NotFoundPage = () => {
   const adminLogged = useSelector(selectAdminLoggged);
   const masterLogged = useSelector(selectMasterLoggged);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleGoBackToDashboard = () => {
+    dispatch(resetError());
+    navigate("/");
+  };
 
   return (
     <div className="mx-auto min-h-screen w-max p-8">
@@ -16,12 +25,12 @@ const NotFoundPage = () => {
 
       {adminLogged && (
         <div className="mt-8">
-          <Link
+          <button
             className="rounded-full border-2 border-solid border-primary px-4 py-2 text-primary"
-            to={"/"}
+            onClick={handleGoBackToDashboard}
           >
             Go Back to Dashboard
-          </Link>
+          </button>
         </div>
       )}
       {masterLogged && (

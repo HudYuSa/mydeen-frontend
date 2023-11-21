@@ -28,6 +28,10 @@ const logout = () => {
   return http.get("/api/admin/logout");
 };
 
+const updateAdminUsername = (username) => {
+  return http.patch(`/api/admin/edit/username`, { username });
+};
+
 const adminService = {
   getLiveEvents,
   signup,
@@ -36,5 +40,6 @@ const adminService = {
   checkOtp,
   profile,
   logout,
+  updateAdminUsername,
 };
 export default adminService;

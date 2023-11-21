@@ -1,17 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import eventService from "../api/services/eventService";
+import { createSelector } from "reselect";
 import {
   convertArrayToCamelCase,
   convertToCamelCase,
-  convertToUnderscoreCase,
+  convertObjToUnderscoreCase,
 } from "../utils/json";
 
 const initialState = {
   data: {
     events: [],
-    scheduledEvents: [],
-    finishedEvents: [],
-    liveEvent: null,
   },
   status: "idle",
   error: false,
@@ -24,7 +22,7 @@ export const createEvent = createAsyncThunk(
     try {
       setSubmitting(true);
       const res = await eventService.createEvent(
-        convertToUnderscoreCase(createEventCredentials),
+        convertObjToUnderscoreCase(createEventCredentials),
       );
       console.log(res);
       return res.data;
@@ -42,6 +40,20 @@ export const createEvent = createAsyncThunk(
   },
 );
 
+export const deleteEvent = createAsyncThunk(
+  "events/deleteEvent",
+  async ({ eventId }, { rejectWithValue }) => {
+    try {
+      const res = await eventService.deleteEvent(eventId);
+      console.log(res);
+      return { data: res.data.data, eventId };
+    } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
 export const getScheduledEvents = createAsyncThunk(
   "events/getScheduledEvents",
   async (_, { rejectWithValue }) => {
@@ -52,26 +64,6 @@ export const getScheduledEvents = createAsyncThunk(
     } catch (err) {
       console.error("Request failed", err);
       return rejectWithValue(err.response.data);
-    }
-  },
-);
-
-export const deleteEvent = createAsyncThunk(
-  "events/deleteEvent",
-  async ({ eventId, setSubmitting }, { rejectWithValue }) => {
-    try {
-      setSubmitting(true);
-      const res = await eventService.deleteEvent(
-        convertToUnderscoreCase(eventId),
-      );
-      console.log(res);
-      return res.data;
-    } catch (err) {
-      setSubmitting(false);
-      console.error("Request failed", err);
-      return rejectWithValue(err.response.data);
-    } finally {
-      setSubmitting(false);
     }
   },
 );
@@ -98,29 +90,163 @@ export const getLiveEvent = createAsyncThunk(
       console.log(res);
       return res.data;
     } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const getEvent = createAsyncThunk(
+  "events/getEvent",
+  async (eventCode, { rejectWithValue }) => {
+    try {
+      setTimeout(() => {}, 3000);
+
+      const res = await eventService.getEvent(eventCode);
+      console.log(res);
+      return res.data;
+    } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const startEvent = createAsyncThunk(
+  "events/startEvent",
+  async ({ eventId }, { rejectWithValue }) => {
+    try {
+      const res = await eventService.startEvent(eventId);
+      console.log(res);
+      return { data: res.data.data, eventId, status: "live" };
+    } catch (err) {
       // console.error("Request failed", err);
       return rejectWithValue(err.response.data);
     }
   },
 );
 
-const eventslice = createSlice({
+export const finishEvent = createAsyncThunk(
+  "events/finishEvent",
+  async ({ eventId }, { rejectWithValue }) => {
+    try {
+      const res = await eventService.finishEvent(eventId);
+      console.log(res);
+      return { data: res.data.data, eventId, status: "finished" };
+    } catch (err) {
+      // console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const updateEventName = createAsyncThunk(
+  "events/updateEventName",
+  async ({ eventId, eventName, toggle }, { rejectWithValue }) => {
+    try {
+      const res = await eventService.updateEventName(eventId, eventName);
+      console.log(res);
+      toggle();
+      return { data: res.data.data, eventId, eventName };
+    } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const updateEventDate = createAsyncThunk(
+  "events/updateEventDate",
+  async ({ eventId, startDate, toggle }, { rejectWithValue }) => {
+    try {
+      const res = await eventService.updateEventDate(eventId, startDate);
+      console.log(res);
+      toggle();
+      return { data: res.data.data, eventId, startDate };
+    } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const updateEventModeration = createAsyncThunk(
+  "events/updateEventModeration",
+  async ({ eventId, moderation }, { rejectWithValue }) => {
+    try {
+      console.log(moderation);
+      const res = await eventService.updateModeration(eventId, moderation);
+      console.log(res);
+      return { data: res.data.data, eventId, moderation };
+    } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const updateEventMaxQuestionLength = createAsyncThunk(
+  "events/updateEventMaxQuestionLength",
+  async ({ eventId, maxQuestionLength }, { rejectWithValue }) => {
+    try {
+      console.log(maxQuestionLength);
+      const res = await eventService.updateMaxQuestionLength(
+        eventId,
+        maxQuestionLength,
+      );
+      console.log(res);
+      return { data: res.data.data, eventId, maxQuestionLength };
+    } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+export const updateMaxQuestions = createAsyncThunk(
+  "events/updateMaxQuestions",
+  async ({ eventId, maxQuestions }, { rejectWithValue }) => {
+    try {
+      console.log(maxQuestions);
+      const res = await eventService.updateMaxQuestions(eventId, maxQuestions);
+      console.log(res);
+      return { data: res.data.data, eventId, maxQuestions };
+    } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
+const eventsSlice = createSlice({
   initialState,
   name: "events",
-  reducers: {},
+  reducers: {
+    resetEvents(state) {
+      state.data.events = [];
+    },
+    resetError(state) {
+      state.status = "idle";
+      state.error = false;
+      state.message = "";
+    },
+    resetErrorStatus(state) {
+      state.error = false;
+    },
+    resetErrorMessage(state) {
+      state.message = "";
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(createEvent.pending, (state) => {
         state.status = "pending";
       })
       .addCase(createEvent.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.status = "success";
         state.error = false;
         console.log(action);
-        state.data.scheduledEvents.push(
-          convertToCamelCase(action.payload.data),
-        );
-        state.data.events.push(convertToCamelCase(action.payload.data));
+        state.data.events.unshift(convertToCamelCase(action.payload.data));
       })
       .addCase(createEvent.rejected, (state, action) => {
         state.status = "idle";
@@ -132,14 +258,10 @@ const eventslice = createSlice({
         state.status = "pending";
       })
       .addCase(getScheduledEvents.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.status = "success";
         state.error = false;
         console.log(action);
-
-        state.data.scheduledEvents = convertArrayToCamelCase(
-          action.payload.data,
-        );
-        state.data.events = convertArrayToCamelCase(action.payload.data);
+        state.data.events.push(...convertArrayToCamelCase(action.payload.data));
       })
       .addCase(getScheduledEvents.rejected, (state, action) => {
         state.status = "idle";
@@ -151,14 +273,10 @@ const eventslice = createSlice({
         state.status = "pending";
       })
       .addCase(getFinishedEvents.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.status = "success";
         state.error = false;
         console.log(action);
-
-        state.data.finishedEvents = convertArrayToCamelCase(
-          action.payload.data,
-        );
-        state.data.events = convertArrayToCamelCase(action.payload.data);
+        state.data.events.push(...convertArrayToCamelCase(action.payload.data));
       })
       .addCase(getFinishedEvents.rejected, (state, action) => {
         state.status = "idle";
@@ -170,37 +288,258 @@ const eventslice = createSlice({
         state.status = "pending";
       })
       .addCase(getLiveEvent.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.status = "success";
         state.error = false;
         console.log(action);
-        state.data.liveEvent = convertToCamelCase(action.payload.data);
+        if (action.payload.data.length > 0) {
+          if (
+            state.data.events.every(
+              (e) => e.eventId !== action.payload.data[0].event_id,
+            )
+          ) {
+            state.data.events.push(
+              ...convertArrayToCamelCase(action.payload.data),
+            );
+          }
+        }
       })
-      .addCase(getLiveEvent.rejected, (state) => {
+      .addCase(getLiveEvent.rejected, (state, action) => {
         state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
       })
       .addCase(deleteEvent.pending, (state) => {
         state.status = "pending";
       })
       .addCase(deleteEvent.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.status = "success";
         state.error = false;
         console.log(action);
-
-        state.data.liveEvent = convertToCamelCase(action.payload.data);
+        state.data.events = state.data.events.filter((e) => {
+          console.log(e.eventId);
+          return e.eventId !== action.payload.eventId;
+        });
       })
-      .addCase(deleteEvent.rejected, (state) => {
+      .addCase(deleteEvent.rejected, (state, action) => {
         state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(startEvent.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(startEvent.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        state.data.events = state.data.events.map((e) => {
+          if (e.eventId === action.payload.eventId) {
+            return { ...e, status: action.payload.status };
+          } else {
+            return e;
+          }
+        });
+      })
+      .addCase(startEvent.rejected, (state, action) => {
+        state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(finishEvent.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(finishEvent.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        state.data.events = state.data.events.map((e) => {
+          if (e.eventId === action.payload.eventId) {
+            return { ...e, status: action.payload.status };
+          } else {
+            return e;
+          }
+        });
+      })
+      .addCase(finishEvent.rejected, (state, action) => {
+        state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(getEvent.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(getEvent.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        if (
+          state.data.events.every(
+            (e) => e.eventId !== action.payload.data.event_id,
+          )
+        ) {
+          state.data.events.push(convertToCamelCase(action.payload.data));
+        }
+      })
+      .addCase(getEvent.rejected, (state, action) => {
+        state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(updateEventName.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(updateEventName.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        state.data.events = state.data.events.map((e) => {
+          if (e.eventId === action.payload.eventId) {
+            return { ...e, eventName: action.payload.eventName };
+          } else {
+            return e;
+          }
+        });
+      })
+      .addCase(updateEventName.rejected, (state, action) => {
+        state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(updateEventDate.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(updateEventDate.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        state.data.events = state.data.events.map((e) => {
+          if (e.eventId === action.payload.eventId) {
+            return { ...e, startDate: action.payload.startDate };
+          } else {
+            return e;
+          }
+        });
+      })
+      .addCase(updateEventDate.rejected, (state, action) => {
+        state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(updateEventModeration.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(updateEventModeration.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        state.data.events = state.data.events.map((e) => {
+          if (e.eventId === action.payload.eventId) {
+            return { ...e, moderation: action.payload.moderation };
+          } else {
+            return e;
+          }
+        });
+      })
+      .addCase(updateEventModeration.rejected, (state, action) => {
+        state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(updateEventMaxQuestionLength.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(updateEventMaxQuestionLength.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        state.data.events = state.data.events.map((e) => {
+          if (e.eventId === action.payload.eventId) {
+            return {
+              ...e,
+              maxQuestionLength: action.payload.maxQuestionLength,
+            };
+          } else {
+            return e;
+          }
+        });
+      })
+      .addCase(updateEventMaxQuestionLength.rejected, (state, action) => {
+        state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(updateMaxQuestions.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(updateMaxQuestions.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        state.data.events = state.data.events.map((e) => {
+          if (e.eventId === action.payload.eventId) {
+            return {
+              ...e,
+              maxQuestions: action.payload.maxQuestions,
+            };
+          } else {
+            return e;
+          }
+        });
+      })
+      .addCase(updateMaxQuestions.rejected, (state, action) => {
+        state.status = "idle";
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
       });
   },
 });
 
 export const selectEvents = (state) => state.events.data.events;
-export const selectScheduledEvents = (state) =>
-  state.events.data.scheduledEvents;
-export const selectFinishedEvents = (state) => state.events.data.finishedEvents;
-export const selectLiveEvent = (state) => state.events.data.liveEvent;
 export const selectEventsStatus = (state) => state.events.status;
 export const selectEventsError = (state) => state.events.error;
 export const selectEventsErrorMessage = (state) => state.events.message;
 
-export default eventslice.reducer;
+export const { resetEvents, resetError, resetErrorMessage, resetErrorStatus } =
+  eventsSlice.actions;
+
+export const selectScheduledEvents = createSelector(
+  [selectEvents],
+  (events) => {
+    // Your logic to filter scheduled events here
+    return events.filter((e) => e.status === "scheduled");
+  },
+);
+
+export const selectFinishedEvents = createSelector([selectEvents], (events) => {
+  // Your logic to filter scheduled events here
+  return events.filter((e) => e.status === "finished");
+});
+
+export const selectLiveEvents = createSelector([selectEvents], (events) => {
+  // Your logic to filter scheduled events here
+  return events.filter((e) => e.status === "live");
+});
+
+// selector.js
+export const selectEventByEventCode = createSelector(
+  [
+    // Usual first input - extract value from `state`
+    selectEvents,
+    // Take the second arg, `category`, and forward to the output selector
+    (_, eventCode) => eventCode,
+  ],
+  // Output selector gets (`items, category)` as args
+  (events, eventCode) => events.find((e) => e.eventCode === eventCode),
+);
+
+export default eventsSlice.reducer;

@@ -2,19 +2,71 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   logout,
   selectAdmin,
+  selectAdminError,
+  selectAdminErrorMessage,
   selectAdminLoggged,
+  selectAdminStatus,
+  updateAdminUsername,
 } from "../../slices/adminSlice";
 import { IoArrowBack } from "react-icons/io5";
 import { FaChevronRight } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { motion } from "framer-motion";
+import UpdateAdminUsername from "../features/UpdateAdminUsername";
+import Popup from "../common/Popup";
 
 const AdminSetting = () => {
   const admin = useSelector(selectAdmin);
   const adminLogged = useSelector(selectAdminLoggged);
+  const adminError = useSelector(selectAdminError);
+  const adminErrorMessage = useSelector(selectAdminErrorMessage);
+  const adminStatus = useSelector(selectAdminStatus);
+
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [updateUsernamePopup, setUpdateUsernamePopup] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const updateAdminUsernameFormik = useFormik({
+    initialValues: {
+      username: admin.username,
+    },
+    validationSchema: Yup.object({
+      username: Yup.string().required("Username is required"),
+    }),
+    onSubmit: ({ username }) => {
+      console.log(username);
+      dispatch(
+        updateAdminUsername({ username, toggle: toggleUpdateUsernamePopup }),
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (!adminLogged) {
+      navigate("/");
+    }
+  }, [adminLogged, navigate]);
+
+  useEffect(() => {
+    if (adminError) {
+      setShowErrorMessage(true);
+      const timer = setTimeout(() => {
+        setShowErrorMessage(false);
+      }, 2000); // 3000 milliseconds (3 seconds)
+      return () => clearTimeout(timer); // Clear the timer when the component unmounts
+    }
+  }, [adminError, adminStatus]);
+
+  const toggleUpdateUsernamePopup = () => {
+    setUpdateUsernamePopup((prev) => {
+      return !prev;
+    });
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -23,12 +75,6 @@ const AdminSetting = () => {
   const goBack = () => {
     navigate(-1);
   };
-
-  useEffect(() => {
-    if (!adminLogged) {
-      navigate("/");
-    }
-  }, [adminLogged, navigate]);
 
   return (
     <div className="flex min-h-screen flex-col bg-mainBackground">
@@ -41,19 +87,19 @@ const AdminSetting = () => {
           <h1 className="flex-grow text-center text-xl">Settings</h1>
         </nav>
       </header>
-      <main>
+      <main className="mx-auto w-full max-w-2xl text-center">
         <h2 className="p-4 text-lg text-gray-600">Account information</h2>
-        <ul className="border-y-2 bg-white ">
+        <ul className="border-y-2 bg-white sm:rounded-xl sm:border">
           <li className="ml-4 flex items-center justify-between border-b-2 py-2 pr-2">
             <p>Username</p>{" "}
             <div>
-              <Link
-                to={"/admin/setting/username"}
+              <button
+                onClick={toggleUpdateUsernamePopup}
                 className="flex items-center justify-end gap-2"
               >
                 <p>{admin.username}</p>
                 <FaChevronRight />
-              </Link>
+              </button>
             </div>
           </li>
           <li className="ml-4 flex items-center justify-between border-b-2 py-2 pr-2">
@@ -84,6 +130,38 @@ const AdminSetting = () => {
           Logout
         </button>
       </main>
+
+      {adminError && showErrorMessage && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
+          className="fixed mt-2 w-full max-w-2xl rounded bg-red-500 px-6 py-1"
+        >
+          <p className="text-white">{adminErrorMessage}</p>
+        </motion.div>
+      )}
+      {adminError && !showErrorMessage && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed mt-2 w-full max-w-2xl rounded bg-red-500 px-6 py-1"
+        >
+          <p className="text-white">{adminErrorMessage}</p>
+        </motion.div>
+      )}
+
+      <Popup
+        popup={updateUsernamePopup}
+        togglePopup={toggleUpdateUsernamePopup}
+        content={
+          <UpdateAdminUsername
+            formik={updateAdminUsernameFormik}
+            toggleUpdateNamePopup={toggleUpdateUsernamePopup}
+          />
+        }
+      />
     </div>
   );
 };

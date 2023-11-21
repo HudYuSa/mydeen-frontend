@@ -78,9 +78,24 @@ export const logout = createAsyncThunk(
   },
 );
 
+export const updateAdminUsername = createAsyncThunk(
+  "admin/updateAdminUsername",
+  async ({ username, toggle }, { rejectWithValue }) => {
+    try {
+      const res = await adminService.updateAdminUsername(username);
+      console.log(res);
+      toggle();
+      return { data: res.data.data, username };
+    } catch (err) {
+      console.error("Request failed", err);
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
 const adminSlice = createSlice({
   initialState,
-  name: "master",
+  name: "admin",
   reducers: {
     refreshAdminData(state) {
       state.status = "idle";
@@ -145,6 +160,22 @@ const adminSlice = createSlice({
       .addCase(logout.rejected, (state, action) => {
         state.status = "idle";
         // error message from backend
+        console.log(action);
+        state.error = action.payload.error;
+        state.message = action.payload.message;
+      })
+      .addCase(updateAdminUsername.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(updateAdminUsername.fulfilled, (state, action) => {
+        state.status = "success";
+        state.error = false;
+        console.log(action);
+        const camelCaseNamingData = convertToCamelCase(action.payload.data);
+        state.data = { logged: true, ...camelCaseNamingData };
+      })
+      .addCase(updateAdminUsername.rejected, (state, action) => {
+        state.status = "idle";
         console.log(action);
         state.error = action.payload.error;
         state.message = action.payload.message;

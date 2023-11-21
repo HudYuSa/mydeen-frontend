@@ -9,11 +9,12 @@ import GenerateInvitationCode from "./components/pages/GenerateInvitationCode";
 import AdminDashboard from "./components/pages/AdminDashboard";
 import NotFoundPage from "./components/pages/NotFoundPage";
 import AdminSetting from "./components/pages/AdminSetting";
-import EditUsernameAdmin from "./components/features/EditUsernameAdmin";
-import EditEmailAdmin from "./components/features/EditEmailAdmin";
 import Authenticate from "./components/middlewares/Authenticate";
 import EventPage from "./components/pages/EventPage";
 import EventPagePresent from "./components/pages/EventPagePresent";
+import EventSetting from "./components/pages/EventSetting";
+import FetchEvent from "./components/middlewares/FetchEvent";
+import EventNotFound from "./components/pages/EventNotFound";
 
 function App() {
   return (
@@ -21,6 +22,10 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+
+          <Route path="event/notfound" element={<EventNotFound />} />
+
+          <Route path="*" element={<NotFoundPage />} />
           {/* auth */}
           <Route element={<Authenticate />}>
             <Route path="/master/signup" element={<SignupMasterPage />} />
@@ -35,20 +40,22 @@ function App() {
               path="/master/generate-invitation"
               element={<GenerateInvitationCode />}
             />
-            <Route path="/admin/setting" element={<AdminSetting />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route
-              path="/admin/setting/username"
-              element={<EditUsernameAdmin />}
-            />
-            <Route path="/admin/setting/email" element={<EditEmailAdmin />} />
 
-            <Route path="/event/:eventId" element={<EventPage />} />
-            <Route
-              path="/event/:eventId/present"
-              element={<EventPagePresent />}
-            />
-            <Route path="*" element={<NotFoundPage />} />
+            <Route path="/admin/setting" element={<AdminSetting />} />
+
+            <Route element={<FetchEvent />}>
+              <Route path="/event/:eventCode" element={<EventPage />} />
+
+              <Route
+                path="/event/:eventCode/present"
+                element={<EventPagePresent />}
+              />
+              <Route
+                path="/event/:eventCode/settings"
+                element={<EventSetting />}
+              />
+            </Route>
           </Route>
         </Routes>
       </Router>

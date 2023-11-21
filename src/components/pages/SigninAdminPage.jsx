@@ -59,7 +59,7 @@ const SigninAdminPage = () => {
           <h2 className="mx-2 mt-4 text-lg">
             atau{" "}
             <span>
-              <Link to={"/admin/signin"} className="text-blue-500">
+              <Link to={"/admin/signup"} className="text-blue-500">
                 Buat akun baru
               </Link>
             </span>

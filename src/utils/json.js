@@ -1,4 +1,4 @@
-export function convertToUnderscoreCase(obj) {
+export function convertObjToUnderscoreCase(obj) {
   const underscoreObj = {};
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {

@@ -1,4 +1,55 @@
-const CreateEventForm = ({ formik }) => {
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createEvent,
+  selectEventsError,
+  selectEventsErrorMessage,
+} from "../../slices/eventSlice";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useEffect, useRef } from "react";
+
+const CreateEventForm = () => {
+  const eventNameRef = useRef();
+
+  const dispatch = useDispatch();
+
+  const eventsError = useSelector(selectEventsError);
+  const eventsErrorMessage = useSelector(selectEventsErrorMessage);
+
+  const currentDate = new Date();
+  const formik = useFormik({
+    initialValues: {
+      eventName: "new event",
+      date: currentDate.toISOString().split("T")[0],
+      time: "20:00",
+    },
+    validationSchema: Yup.object({
+      eventName: Yup.string().required("Event name is required"),
+      date: Yup.date().required("Date is required"),
+      time: Yup.string()
+        .matches(
+          /^(?:[01]\d|2[0-3]):[0-5]\d$/,
+          'Time must be in the "HH:mm" format (24-hour)',
+        )
+        .required("Time is required"),
+    }),
+    onSubmit: ({ eventName, date, time }, { setSubmitting }) => {
+      const startDate = date + " " + time + ":00";
+      dispatch(
+        createEvent({
+          createEventCredentials: { eventName, startDate },
+          setSubmitting,
+        }),
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (eventNameRef.current) {
+      eventNameRef.current.focus();
+    }
+  }, []);
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <div>
@@ -6,6 +57,7 @@ const CreateEventForm = ({ formik }) => {
           Event Name
         </label>
         <input
+          ref={eventNameRef}
           type="text"
           id="eventName"
           name="eventName"
@@ -67,6 +119,11 @@ const CreateEventForm = ({ formik }) => {
       >
         {formik.isSubmitting ? "Creating..." : "Create Event"}
       </button>
+      {eventsError && (
+        <p className="mt-4 text-center text-lg text-red-500">
+          {eventsErrorMessage}
+        </p>
+      )}
     </form>
   );
 };

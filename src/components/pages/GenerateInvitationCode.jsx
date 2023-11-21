@@ -34,27 +34,33 @@ const GenerateInvitationCode = () => {
     }
   }, [masterLogged, navigate]);
   return (
-    <>
-      <AppLogo />
-      <main className="mx-auto w-4/5 max-w-lg flex-grow">
-        <form onSubmit={formik.handleSubmit}>
-          <button
-            className={`${
-              formik.isSubmitting ? "bg-primarySoft" : "bg-primary"
-            } my-4 w-full rounded-lg py-2 text-lg text-white outline-none`}
-            type="submit"
-            disabled={formik.isSubmitting}
-          >
-            {formik.isSubmitting ? "Generating..." : "Generate invitation code"}
-          </button>
-        </form>
-        {masterError && (
-          <p className="mt-2 text-center text-red-500">{masterErrorMessage}</p>
-        )}
+    masterLogged && (
+      <>
+        <AppLogo />
+        <main className="mx-auto w-4/5 max-w-lg flex-grow">
+          <form onSubmit={formik.handleSubmit}>
+            <button
+              className={`${
+                formik.isSubmitting ? "bg-primarySoft" : "bg-primary"
+              } my-4 w-full rounded-lg py-2 text-lg text-white outline-none`}
+              type="submit"
+              disabled={formik.isSubmitting}
+            >
+              {formik.isSubmitting
+                ? "Generating..."
+                : "Generate invitation code"}
+            </button>
+          </form>
+          {masterError && (
+            <p className="mt-2 text-center text-red-500">
+              {masterErrorMessage}
+            </p>
+          )}
 
-        <p>Invitation code: {master?.invitationCode}</p>
-      </main>
-    </>
+          <p>Invitation code: {master?.invitationCode}</p>
+        </main>
+      </>
+    )
   );
 };
 export default GenerateInvitationCode;
